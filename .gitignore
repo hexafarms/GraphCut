@@ -1,0 +1,5 @@
+*.bat
+.vscode
+images/
+ground_data/
+pyGCO_master/
