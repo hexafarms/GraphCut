@@ -11,5 +11,7 @@ First segmenting the area of leaves,
 and then compute the area of leaves.
 
 ## Requirements
-You need to install pygco to run graphic cut efficiently:
+Run `pip install -r requrements.txt` to install all the dependencies.
+
+You may build and install pygco from source to run graphic cut efficiently:
 URL: https://github.com/Borda/pyGCO
