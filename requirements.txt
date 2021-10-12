@@ -1,10 +1,20 @@
+certifi==2021.10.8
 cycler==0.10.0
-imageio==2.9.0
-kiwisolver==1.3.2
-matplotlib==3.4.3
-numpy==1.21.2
-opencv-contrib-python==4.5.3.56
-Pillow==8.3.2
+Cython==0.29.24
+gco-wrapper==3.0.8
+imageio @ file:///home/conda/feedstock_root/build_artifacts/imageio_1594044661732/work
+kiwisolver @ file:///D:/bld/kiwisolver_1630173896207/work
+matplotlib @ file:///D:/bld/matplotlib-suite_1632417749342/work
+numpy @ file:///D:/bld/numpy_1629092230867/work
+olefile @ file:///home/conda/feedstock_root/build_artifacts/olefile_1602866521163/work
+opencv-python==4.5.3.56
+Pillow @ file:///D:/bld/pillow_1630696805646/work
 pyparsing==2.4.7
-python-dateutil==2.8.2
-six==1.16.0
+PyQt5==5.12.3
+PyQt5_sip==4.19.18
+PyQtChart==5.12
+PyQtWebEngine==5.12.1
+python-dateutil @ file:///home/conda/feedstock_root/build_artifacts/python-dateutil_1626286286081/work
+six @ file:///home/conda/feedstock_root/build_artifacts/six_1620240208055/work
+tornado @ file:///D:/bld/tornado_1610094858390/work
+urllib3==1.26.7
