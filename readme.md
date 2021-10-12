@@ -16,7 +16,11 @@ and then compute the area of leaves.
 1. Define appropriate initial mask pixel location by using 'test_seg_mask.py'  
 ref_fg = [350, 450, 1800, 1910]  
 ref_bg = [0, 240, 0, 2500]  
-![alt text](demo\initial_mask.png)
+<div align="left">
+  <img src="demo\initial_mask.png" width="600"/>
+</div>
+<br />
+
 
 2. Generate color histogram by using 'generate_histogram.py'  
 Multiple reigon from multiple images could be selected.  
@@ -35,7 +39,11 @@ python generate_histogram.py images\image-1550434545.jpg images\image-1550079998
 --work_dir ground_data  
 
 You will see histograms as below.  
-![alt text](demo\histograms.jpeg)
+<div align="left">
+  <img src="demo\histograms.jpeg" width="400"/>
+</div>
+<br />
+
 
 3. Segment images based on the color histogram, and then optimize the segmentation mask by using 'cut&#46;.py'
   
@@ -45,8 +53,10 @@ Example of 'cut&#46;.bat' follows this structure.
   python cut&#46;py images\image-1550434545.jpg --histograms ground_data\histograms.npy
 
 You will see segmentation and its area as below.  
-![alt text](demo\cut.jpeg)
-
+<div align="left">
+  <img src="demo\cut.jpeg" width="400"/>
+</div>
+<br />
 
 ### Requirements
 Run `pip install -r requrements.txt` to install all the dependencies.
