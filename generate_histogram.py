@@ -21,7 +21,7 @@ def calculate_histograms(images, loc_masks, n_bins):
         h, w = im.shape[:2]
 
         init_mask = np.zeros([h, w])
-        init_mask[loc_mask[0]:loc_mask[1], loc_mask[2]:loc_mask[3]] = 1
+        init_mask[loc_mask[1]:loc_mask[3], loc_mask[0]:loc_mask[2]] = 1
 
         # convert values to range of bins
         binned_im = (im.astype(np.float32)/256*n_bins).astype(int)
@@ -38,15 +38,6 @@ def calculate_histograms(images, loc_masks, n_bins):
     combined_histogram /= np.sum(combined_histogram)
 
     return combined_histogram
-
-
-ims = ["image-1550434545.jpg", "image-1550079998.jpg",
-       "image-1550434545.jpg", "image-1550434545.jpg"]
-init_fg_masks = [[350, 450, 1800, 1910], [880, 940, 1820, 1920], [
-    1450, 1500, 1850, 1940], [950, 1000, 1200, 1250]]
-init_bg_masks = [[0, 240, 0, 2500], [250, 320, 0, 500],
-                 [0, 1900, 1420, 1750], [1000, 1500, 1000, 1180]]
-
 
 def parse_args():
     '''Parse input arguments'''
@@ -78,8 +69,6 @@ def parse_args():
 
     return args
 
-
-TODO: "Develop MoG module and make it available to select mode between color histogram and MoG"
 
 if __name__ == '__main__':
     args = parse_args()

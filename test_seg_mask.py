@@ -13,10 +13,12 @@ __Licence__ = 'Hexafarms'
 
 ''' Input '''
 # Location of an image
-im_loc = "images\image-1550434545.jpg"
-# Pixels of fore&back ground. [left top, left botom, right top, right bottom]
-ref_fg = [350, 450, 1800, 1910]
-ref_bg = [0, 240, 0, 2500]
+im_loc = "data/2.jpg"
+# Pixels of fore&back ground. [left top's x, y and right bottm's x, y]
+# ref_fg = [ 272, 354, 556, 617,]
+ref_fg = [553, 319, 606, 360]
+# ref_bg = [0, 230, 0, 2500]
+ref_bg = [52, 401, 1242, 431]
 ''''''''''''''''''
 
 
@@ -43,8 +45,8 @@ This should be a part of the image that is fully foreground.
 
 init_fg_mask = np.zeros([h, w])
 init_bg_mask = np.zeros([h, w])
-init_fg_mask[ref_fg[0]: ref_fg[1], ref_fg[2]:ref_fg[3]] = 1
-init_bg_mask[ref_bg[0]:ref_bg[1], ref_bg[2]:ref_bg[3]] = 1
+init_fg_mask[ref_fg[1]: ref_fg[3], ref_fg[0]:ref_fg[2]] = 1
+init_bg_mask[ref_bg[1]:ref_bg[3], ref_bg[0]:ref_bg[2]] = 1
 
 
 fig, axes = plt.subplots(1, 2, figsize=(10,5))

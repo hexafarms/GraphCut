@@ -3,3 +3,5 @@
 images/
 ground_data/
 pyGCO_master/
+data/
+*.sh

@@ -3,7 +3,8 @@ import matplotlib.pyplot as plt
 import imageio
 import cv2
 import argparse
-from pyGCO_master.gco import pygco
+from pyGCO.gco import pygco
+import pickle
 
 __title__ = 'Initial masking tester'
 __Version__ = '1.0'
@@ -12,7 +13,7 @@ __Contact__ = 'huijo.k@hexafarms.com'
 __Licence__ = 'Hexafarms'
 
 
-def foreground_pmap(img, fg_histogram, bg_histogram):
+def fg_pmap_hist(img, fg_histogram, bg_histogram):
     h, w, c = img.shape
     n_bins = len(fg_histogram)
     binned_im = (img.astype(np.float32)/256*n_bins).astype(int)
@@ -35,9 +36,27 @@ def foreground_pmap(img, fg_histogram, bg_histogram):
     return p_fg_given_rgb
 
 
-def unary_potentials(probability_map, unary_weight):
-    return -unary_weight * np.log(probability_map) / np.log(1000000000)
+def fg_pmap_MoG(img, fg_gmm, bg_gmm):
 
+    # prior probabilities
+    p_fg = 0.5
+    p_bg = 1 - p_fg
+
+    pixel_values = img.reshape((-1, 3))
+
+    # extract fg & bg prob from histograms
+    p_rgb_given_fg = np.exp(fg_gmm.score_samples(pixel_values))
+
+    p_rgb_given_bg = np.exp(bg_gmm.score_samples(pixel_values))
+
+    p_fg_given_rgb = (p_fg * p_rgb_given_fg /
+                      (p_fg * p_rgb_given_fg + p_bg * p_rgb_given_bg))
+    # reshape to original image size
+    return p_fg_given_rgb.reshape(img.shape[:2])
+
+
+def unary_potentials(probability_map, unary_weight):
+    return -unary_weight * np.log(probability_map) / 100 
 
 
 def pairwise_potential_prefactor(img, x1, y1, x2, y2, pairwise_weight):
@@ -91,38 +110,7 @@ def graph_cut(unary_fg, unary_bg, pairwise_edges, pairwise_costs):
     return labels.reshape(unary_fg.shape)
 
 
-def parse_args():
-    '''Parse input arguments'''
-    parser = argparse.ArgumentParser(
-        description="Graph cut")
-    parser.add_argument("input",
-                        help="Location of input images to segment.")
-
-    parser.add_argument("--histograms",
-                        default='ground_data\histograms.npy',
-                        help="Histograms of foreground and background.")
-    args = parser.parse_args()
-    return args
-
-
-if __name__ == '__main__':
-    args = parse_args()
-
-    im = imageio.imread(args.input)
-    
-    fg_histogram, bg_histogram = np.load(args.histograms)
-    foreground_prob = foreground_pmap(im, fg_histogram, bg_histogram)
-    unary_weight = 1
-    pairwise_weight = 1
-    unary_fg = unary_potentials(foreground_prob, unary_weight)
-    unary_bg = unary_potentials(1 - foreground_prob, unary_weight)
-
-    pairwise_edges, pairwise_costs = pairwise_potentials(
-        im, pairwise_weight=pairwise_weight)
-
-    graph_cut_result = graph_cut(
-        unary_fg, unary_bg, pairwise_edges, pairwise_costs)
-
+def compute_area(im, graph_cut_result, thres=30):
     kernel = np.ones((21, 21), np.uint8)
 
     output = cv2.morphologyEx(graph_cut_result.astype(
@@ -137,7 +125,7 @@ if __name__ == '__main__':
     filtered_contours = []
     for contour in contours:
         c_area = cv2.contourArea(contour)
-        if c_area > 300:
+        if c_area > thres:
             area += c_area
             filtered_contours.append(contour)
 
@@ -146,3 +134,95 @@ if __name__ == '__main__':
     plt.title("Total leaf-area:{}".format(area))
     plt.imshow(drawing2)
     plt.show()
+
+def draw_mask_on_image(image, mask, color=(0, 255, 255)):
+    """Return a visualization of a mask overlaid on an image."""
+    result = image.copy()
+    kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
+    dilated = cv2.morphologyEx(mask.astype(np.uint8), cv2.MORPH_DILATE, kernel)
+    outline = dilated > mask
+    result[mask == 1] = (result[mask == 1] * 0.4 + 
+                         np.array(color) * 0.6).astype(np.uint8)
+    result[outline] = color
+    return result
+
+def parse_args():
+    '''Parse input arguments'''
+    parser = argparse.ArgumentParser(
+        description="Graph cut")
+    parser.add_argument("--input",
+                        help="Location of input images to segment.")
+
+    parser.add_argument("--histograms",
+                        default='ground_data/histograms.npy',
+                        help="Histograms of foreground and background.")
+
+    parser.add_argument("--fg",
+                        default='ground_data/fg_gmm.pkl',
+                        help="Mixture of Gaussian of foreground.")
+
+    parser.add_argument("--bg",
+                        default='ground_data/bg_gmm.pkl',
+                        help="Mixture of Gaussian of background.")
+
+    parser.add_argument("--mode",
+                        default='Histogram',
+                        choices=['MoG', 'Histogram'],
+                        help="Select the method to compute the probability distiribution. MoG or Histogram"
+    )
+
+    args = parser.parse_args()
+    return args
+
+
+
+if __name__ == '__main__':
+    args = parse_args()
+
+    # im = imageio.imread(args.input)
+    im = imageio.imread('data/test.jpg')
+
+    if args.mode == 'MoG':
+        with open(args.fg, 'rb') as f:
+            fg_gmm = pickle.load(f)
+        with open(args.bg, 'rb') as b:
+            bg_gmm = pickle.load(b)
+        
+        foreground_prob = fg_pmap_MoG(im, fg_gmm, bg_gmm)
+
+    else:
+        fg_histogram, bg_histogram = np.load(args.histograms)
+        foreground_prob = fg_pmap_hist(im, fg_histogram, bg_histogram)
+
+    plt.imshow(foreground_prob)
+    plt.show()
+
+    unary_weight = 10
+    pairwise_weight = 1
+    unary_fg = unary_potentials(foreground_prob, unary_weight)
+    unary_bg = unary_potentials(1 - foreground_prob, unary_weight)
+
+    pairwise_edges, pairwise_costs = pairwise_potentials(
+        im, pairwise_weight=pairwise_weight)
+
+    graph_cut_result = graph_cut(
+        unary_fg, unary_bg, pairwise_edges, pairwise_costs)
+
+    fig, axes = plt.subplots(1, 3, figsize=(12,5))
+    axes[0].set_title("Leaf Segmentation")
+    axes[0].imshow(graph_cut_result)
+    axes[1].set_title('Original Image')
+    axes[1].imshow(im)
+    axes[2].set_title("Overlap")
+    axes[2].imshow(draw_mask_on_image(im, graph_cut_result))
+    fig.tight_layout()
+    plt.show()
+
+    compute_area(im, graph_cut_result)
+
+'''
+example input
+
+python cut.py data/0.jpg --histograms ground_data/histograms.npy
+
+'''
