@@ -58,3 +58,5 @@ Cython==0.29.24
 python-multipart==0.0.5
 uvicorn==0.15.0
 fastapi==0.70.0
+scikit-learn==1.0.1
+scipy==1.7.3
