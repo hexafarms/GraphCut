@@ -57,4 +57,4 @@ widgetsnbextension==3.5.2
 Cython==0.29.24
 python-multipart==0.0.5
 uvicorn==0.15.0
-uvicorn==0.15.0
+fastapi==0.70.0
