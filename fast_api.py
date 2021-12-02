@@ -16,7 +16,7 @@ async def create_upload_file(file: UploadFile = File(...)):
         file_object.write(file.file.read())
 
     ############################ Current Best Model ###############################
-    histograms= "/ground_data/histograms.npy"
+    histograms= "./ground_data/histograms.npy"
     ################################################################################
 
     input_dir = f"fast_api/input/{file.filename}"

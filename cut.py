@@ -193,8 +193,6 @@ def segment_api(histograms, in_dir, out_dir):
 
     overlap = plot(im, graph_cut_result, thres=30, visualize=False)
 
-    breakpoint()
-
     imageio.imwrite(os.path.join(out_dir, os.path.basename(in_dir)), overlap)
 
 
