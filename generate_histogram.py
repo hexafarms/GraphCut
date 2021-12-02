@@ -107,14 +107,14 @@ if __name__ == '__main__':
 
 """
 example input 
-python generate_histogram.py images\image-1550434545.jpg images\image-1550079998.jpg images\image-1550434545.jpg images\image-1550434545.jpg ^
---init_fg_masks 350 450 1800 1910 ^
---init_fg_masks 880 940 1820 1920 ^
---init_fg_masks 1450 1500 1850 1940 ^
---init_fg_masks 950 1000 1200 1250 ^
---init_bg_masks 0 240 0 2500 ^
---init_bg_masks 250 320 0 500 ^
---init_bg_masks 0 1900 1420 1750 ^
---init_bg_masks 1000 1500 1000 1100 ^
+python generate_histogram.py data/1.jpg data/1.jpg data/2.jpg data/2.jpg \
+--init_fg_masks  553 319 606 360 \
+--init_fg_masks  1215 260 1244 278 \
+--init_fg_masks  718 95 740 165 \
+--init_fg_masks  273 308 300 335 \
+--init_bg_masks 52 401 1242 431 \
+--init_bg_masks 0 0 1277 214 \
+--init_bg_masks 870 0 1054 717 \
+--init_bg_masks 134 5 187 674 \
 --work_dir ground_data
 """

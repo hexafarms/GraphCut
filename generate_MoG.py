@@ -5,6 +5,7 @@ from sklearn.mixture import GaussianMixture
 import pickle
 import os
 import matplotlib.pyplot as plt
+from sklearn.preprocessing import StandardScaler, MinMaxScaler
 
 __Version__ = '1.0'
 __Author__ = 'Kim, Huijo'
@@ -22,9 +23,14 @@ def compute_MoG(images, K, loc_masks):
         
         init_mask = np.zeros([h, w])
         init_mask[loc_mask[1]:loc_mask[3], loc_mask[0]:loc_mask[2]] = 1
-
         
-        crop_im = im[np.ix_(init_mask.any(1), init_mask.any(0))]
+        crop_im = im[np.ix_(init_mask.any(1), init_mask.any(0))].astype(np.float32)
+        
+        # Standardization of the image
+        scalers = {}
+        for i in range(crop_im.shape[2]):
+            scalers[i] = MinMaxScaler()
+            crop_im[:,:,i] = scalers[i].fit_transform(crop_im[:,:,i])
 
         # reshape the image to a 2D array of pixels and 3 color values (RGB)
         pixel_values.append(crop_im.reshape((-1, 3)).astype(np.float32))
@@ -32,9 +38,6 @@ def compute_MoG(images, K, loc_masks):
     pixel_values = np.concatenate(pixel_values, axis=0)
 
     output = GaussianMixture(n_components = K).fit(pixel_values)
-
-    # normalize
-    output /= np.sum(output)
 
     return output
 
@@ -75,11 +78,13 @@ def save_object(obj, filename):
 
 def plot(fg_gmm, bg_gmm):
     
-    x = np.linspace(0, 255, 300).reshape(100,3)
+    x = np.linspace(-5, 5, 100)
+    x = np.dstack([x]*3).reshape(-1,3)
     logprob_fg = fg_gmm.score_samples(x)
     pdf_fg = np.exp(logprob_fg)
     logprob_bg = bg_gmm.score_samples(x)
     pdf_bg = np.exp(logprob_bg)
+
 
 
     fig, axes = plt.subplots(1, 2, figsize=(10,5))
@@ -94,7 +99,7 @@ def plot(fg_gmm, bg_gmm):
 if __name__ == '__main__':
     args = parse_args()
 
-    K = 11 # the number of mixture gaussian
+    K = 15 # the number of mixture gaussian
     images = args.image_dir
     fg_loc_masks = args.init_fg_masks
     bg_loc_masks = args.init_bg_masks
