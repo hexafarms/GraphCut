@@ -1,7 +1,7 @@
-from fastapi.responses import Response
 from fastapi import FastAPI, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
-import io
+from fastapi.responses import FileResponse
+import uvicorn
 
 from cut import segment_api as segment_gc
 
@@ -39,9 +39,14 @@ async def create_upload_file(file: UploadFile = File(...)):
     output_dir = "fast_api/output/"
 
     area = segment_gc(histograms, input_dir, output_dir, ratio, thres=30)
-    result = {f'Leaf area of {file.filename}': f'{int(area)} cm^2'}
-    image = open(output_dir+f"/{file.filename}", 'rb')
+    result = {f'Leaf area of {file.filename}': f'{int(area)} cm^2', 'filename': file.filename}
+
+    return result
 
 
-    return Response(content=image, headers=result, media_type=("image/jpeg"or"image/png"))
-    
+@app.get("/image/{image_name}")
+async def get_image(image_name):
+    return FileResponse("fast_api/output/"+image_name)
+
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=8001)
