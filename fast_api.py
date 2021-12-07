@@ -1,4 +1,4 @@
-from fastapi.responses import StreamingResponse
+from fastapi.responses import StreamingResponse, Response
 from fastapi import FastAPI, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -37,7 +37,8 @@ async def create_upload_file(file: UploadFile = File(...)):
     output_dir = "fast_api/output/"
 
     area = segment_gc(histograms, input_dir, output_dir, ratio)
+    result = {f'Leaf area of {file.filename}': f'{int(area)} cm^2'}
     image = open(output_dir+f"/{file.filename}", 'rb')
 
-    return StreamingResponse(image, media_type=("image/jpeg"or"image/png"))
+    return Response(content=image, headers=result, media_type=("image/jpeg"or"image/png"))
     
