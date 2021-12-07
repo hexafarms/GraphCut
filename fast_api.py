@@ -28,10 +28,15 @@ async def create_upload_file(file: UploadFile = File(...)):
     histograms= "/weights/v0/histograms.npy"
     ################################################################################
 
+    ############################### Camera Ratio ##################################
+    # 1/10 means 1pixel is 10cm^2 
+    ratio = (1/13)**2
+    ################################################################################
+
     input_dir = f"fast_api/input/{file.filename}"
     output_dir = "fast_api/output/"
 
-    segment_gc(histograms, input_dir, output_dir)
+    area = segment_gc(histograms, input_dir, output_dir, ratio)
     image = open(output_dir+f"/{file.filename}", 'rb')
 
     return StreamingResponse(image, media_type=("image/jpeg"or"image/png"))

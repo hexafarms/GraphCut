@@ -172,7 +172,37 @@ def plot(im, graph_cut_result, thres=30, visualize=True):
         plt.show()
     return overlap
 
-def segment_api(histograms, in_dir, out_dir):
+def compute_area(graph_cut_result, ratio, thres=30):
+    '''
+    graph_cut_result : mask after graphcut
+    thres : minimum area of detectable plants (less than this value is regards as noise)
+    ratio : ratio of pixel to real dimension in cm^2
+            1/10 means 1pixel is 10cm^2
+            TODO: After Undistortion of camera images, consider the different ratio at edges 
+    '''
+    kernel = np.ones((21, 21), np.uint8)
+
+    output = cv2.morphologyEx(graph_cut_result.astype(
+        'uint8'), cv2.MORPH_OPEN, kernel)
+
+    contours, _ = cv2.findContours(output,
+                                           cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+
+
+    area = 0
+    filtered_contours = []
+    for contour in contours:
+        c_area = cv2.contourArea(contour)
+        if c_area > thres:
+            area += c_area
+            filtered_contours.append(contour)
+
+    ''' area of leaf area in cm^2 '''
+    area_cm = area * (ratio)
+    return area_cm
+
+
+def segment_api(histograms, in_dir, out_dir, ratio, thres):
 
     unary_weight = 0.1
     pairwise_weight = 1
@@ -194,6 +224,8 @@ def segment_api(histograms, in_dir, out_dir):
     overlap = plot(im, graph_cut_result, thres=30, visualize=False)
 
     imageio.imwrite(os.path.join(out_dir, os.path.basename(in_dir)), overlap)
+
+    return compute_area(graph_cut_result, ratio, thres)
 
 
 def parse_args():
@@ -246,6 +278,8 @@ if __name__ == '__main__':
     plt.imshow(foreground_prob)
     plt.show()
 
+    # area = segment_api(args.histograms, in_dir="fast_api/input/dev-0-1638289981.jpg", out_dir="fast_api/output", ratio=(1/13)**2, thres=30 )
+    # print( 'area is ', area)
     ''' main parameters '''
     unary_weight = 0.1
     pairwise_weight = 1
