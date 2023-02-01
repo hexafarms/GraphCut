@@ -50,7 +50,7 @@ You will see histograms as below.
   
 Example of `cut.bat` follows this structure.  
 ```bash  
-python cut&#46;py images\image-1550434545.jpg --histograms ground_data\histograms.npy
+python cut.py images\image-1550434545.jpg --histograms ground_data\histograms.npy
 ```
 You will see segmentation and its area as below.  
 <div align="left">
