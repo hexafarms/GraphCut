@@ -46,9 +46,9 @@ You will see histograms as below.
 <br />
 
 
-3. Segment images based on the color histogram, and then optimize the segmentation mask by using `cut&#46;.py`
+3. Segment images based on the color histogram, and then optimize the segmentation mask by using `cut.py`
   
-Example of `cut&#46;.bat` follows this structure.  
+Example of `cut.bat` follows this structure.  
 ```bash  
 python cut&#46;py images\image-1550434545.jpg --histograms ground_data\histograms.npy
 ```
