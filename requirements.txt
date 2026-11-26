@@ -51,7 +51,7 @@ sympy==1.9
 terminado==0.12.1
 testpath==0.5.0
 tornado == 6.1
-urllib3==1.26.7
+urllib3==2.8.0
 webencodings==0.5.1
 widgetsnbextension==3.5.2
 Cython==0.29.24
