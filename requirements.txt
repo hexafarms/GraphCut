@@ -1,6 +1,6 @@
 argon2-cffi==21.1.0
 bleach==4.1.0
-certifi==2021.10.8
+certifi==2026.10.18
 cycler==0.10.0
 Cython==0.29.24
 defusedxml==0.7.1
